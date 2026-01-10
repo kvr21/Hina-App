@@ -487,6 +487,7 @@ Regras:
                 Expanded(
                   child: TextField(
                     controller: _controller,
+                                      style: const TextStyle(color: Colors.black87),
                     decoration: InputDecoration(
                       hintText: 'Oi Hina...',
                       hintStyle: TextStyle(color: Colors.grey.shade600),
