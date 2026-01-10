@@ -489,7 +489,7 @@ Regras:
                     controller: _controller,
                     decoration: InputDecoration(
                       hintText: 'Oi Hina...',
-                                        hintStyle: TextStyle(color: Colors.grey.shade600),
+                      hintStyle: TextStyle(color: Colors.grey.shade600),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(25),
                         borderSide: BorderSide.none,
