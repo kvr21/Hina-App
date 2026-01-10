@@ -1,3 +1,38 @@
+# Flutter/Dart/Pub
+.dart_tool/
+/.packages
+/.flutter-plugins
+/.flutter-plugins-dependencies
+/.pub-cache
+/.pub/
+build/
+/.dart_tool/
+pubspec.lock
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Xcode
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+Runner.xcworkspace/
+Pods/
+DerivedData/
+
+# Android
+.gradle/
+/local.properties
+/android/.gradle/
+
+# Misc
+*.log
+*.swp
+*.DS_Store
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
