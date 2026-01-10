@@ -234,56 +234,14 @@ class Message {
   });
 }
 
-
-// Tela de Chat
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
   final String userName;
   
   const ChatScreen({super.key, required this.userName});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('💕 Hina - Oi, ${widget.userName}'),
-        centerTitle: true,
-        backgroundColor: Colors.purple.shade400,
-        foregroundColor: Colors.white,
-        elevation: 2,
-        actions: [
-          // Botão Sair visível
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Sair',
-            onPressed: () async {
-              // Confirmar logout
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Sair'),
-                  content: const Text('Quer mesmo sair? Você vai precisar entrar de novo com seu nome.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancelar'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Sair', style: TextStyle(color: Colors.red)),
-                    ),
-                  ],
-                ),
-              );
-
-              if (confirm == true && mounted) {
-                _logout();
-              }
-            },
-          ),
-        ],
-      ),
-
-      }
+  State<ChatScreen> createState() => _ChatScreenState();
+}
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
@@ -293,6 +251,7 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isLoading = false;
 
   static const String _apiKey = String.fromEnvironment('GEMINI_API_KEY');
+
 
   @override
   void initState() {
