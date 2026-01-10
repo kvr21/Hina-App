@@ -1,0 +1,6 @@
+{
+  "name": "hina-app-functions",
+  "version": "1.0.0",
+  "description": "Netlify Functions for Hina App",
+  "type": "module"
+}
