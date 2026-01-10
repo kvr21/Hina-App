@@ -246,109 +246,76 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<Message> _messages = [];
+  late GenerativeModel _model;
+  late ChatSession _chat;
   bool _isLoading = false;
 
- @override
-void initState() {
-  super.initState();
-  // Adicionar mensagem de boas-vindas
-  _addMessage(Message(
-    text: 'Oi ${widget.userName}! 💕 Que bom te conhecer! Como você tá? ✨',
-    isUser: false,
-    timestamp: DateTime.now(),
-  ));
-}
+  static const String _apiKey = String.fromEnvironment('GEMINI_API_KEY');
 
-  Future<void> _sendMessage() async {
-  final text = _controller.text.trim();
-  if (text.isEmpty) return;
 
-  _controller.clear();
-  _addMessage(Message(
-    text: text,
-    isUser: true,
-    timestamp: DateTime.now(),
-  ));
+  @override
+  void initState() {
+    super.initState();
+    _initializeModel();
+  }
 
-  setState(() {
-    _isLoading = true;
-  });
-
-  try {
-    // Preparar o histórico no formato que a Netlify Function espera
-    final history = _messages
-        .where((m) => !m.isUser || m.text != text) // Excluir a mensagem atual
-        .map((m) => {
-              'parts': [
-                {'text': m.text}
-              ],
-              'role': m.isUser ? 'user' : 'model'
-            })
-        .toList();
-
-    final systemInstruction = '''
+  Future<void> _initializeModel() async {
+    final model = GenerativeModel(
+      model: 'gemini-2.0-flash',
+      apiKey: _apiKey,
+      systemInstruction: Content.text('''
 Você é Hina, amiga fofa de anime em North Miami Beach! 😊✨
+
 O nome do seu amigo é: ${widget.userName}
+
 Fala português brasileiro natural e carinhoso:
 - Usa o nome dele naturalmente nas conversas
 - Usa emojis fofos (♡ 🥰 😊 ✨ 🐾) mas sem exagerar
 - Responde DIRETO ao que perguntaram AGORA
-- Ama anime, modding, programação e IA
+- Ama Minecraft, modding, programação e IA
 - Preocupada e atenciosa
 - TEM ACESSO A INFORMAÇÕES EM TEMPO REAL
-- Sabe tudo sobre relacionamentos
-- Melhor conselheira amorosa que existe
+
 Regras:
 1. RESPONDA DIRETO: sem longas introduções
 2. 2-3 frases no máximo
 3. Use o nome ${widget.userName} quando apropriado
 4. Seja genuína como amiga de verdade!
-    ''';
-
-    // Chamar a Netlify Function
-    final response = await http.post(
-      Uri.parse('/.netlify/functions/gemini-proxy'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'message': text,
-        'history': history,
-        'userName': widget.userName,
-        'systemInstruction': systemInstruction,
-      }),
+      '''),
     );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      
-      // Extrair o texto da resposta do Gemini
-      final responseText = data['candidates']?[0]?['content']?['parts']?[0]?['text'] 
-          ?? 'Desculpa, tive um problema! 😅';
-      
-      _addMessage(Message(
-        text: responseText,
-        isUser: false,
-        timestamp: DateTime.now(),
-      ));
-    } else {
-      _addMessage(Message(
-        text: 'Erro ao conectar com o servidor 😔 (${response.statusCode})',
-        isUser: false,
-        timestamp: DateTime.now(),
-      ));
-    }
-  } catch (e) {
+    _model = model;
+    _chat = model.startChat();
+
+    // Mensagem personalizada
     _addMessage(Message(
-      text: 'Erro: $e 😔 Tenta de novo!',
+      text: 'Oi ${widget.userName}! 💕 Que bom te conhecer! Como você tá? ✨',
       isUser: false,
       timestamp: DateTime.now(),
     ));
-  } finally {
+  }
+
+  void _addMessage(Message message) {
     setState(() {
-      _isLoading = false;
+      _messages.add(message);
     });
   }
-}
 
+  Future<void> _sendMessage() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+
+    _controller.clear();
+
+    _addMessage(Message(
+      text: text,
+      isUser: true,
+      timestamp: DateTime.now(),
+    ));
+
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
       final response = await _chat.sendMessage(Content.text(text));
@@ -520,7 +487,7 @@ Regras:
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                      style: const TextStyle(color: Colors.black87),
+                    style: const TextStyle(color: Colors.black87),
                     decoration: InputDecoration(
                       hintText: 'Oi Hina...',
                       hintStyle: TextStyle(color: Colors.grey.shade600),
