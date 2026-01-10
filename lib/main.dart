@@ -234,6 +234,13 @@ class Message {
   });
 }
 
+
+// Tela de Chat
+class ChatScreen extends StatelessWidget {
+  final String userName;
+  
+  const ChatScreen({super.key, required this.userName});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -276,6 +283,7 @@ class Message {
         ],
       ),
 
+      }
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
