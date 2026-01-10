@@ -284,7 +284,7 @@ class _ChatScreenState extends State<ChatScreen> {
   late ChatSession _chat;
   bool _isLoading = false;
 
-  static const String _apiKey = 'AIzaSyBZJRK-pQ8H3-Jt2EuhjboWLRBxrm6z9LY';
+  static const String _apiKey = String.fromEnvironment('GEMINI_API_KEY');
 
   @override
   void initState() {
