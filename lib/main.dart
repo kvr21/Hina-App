@@ -172,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: TextField(
                     controller: _nameController,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 20, color: Colors.white),
+                    style: const TextStyle(fontSize: 20, color: Colors.black),
                     decoration: const InputDecoration(
                       hintText: 'Seu nome aqui...',
                       border: InputBorder.none,
