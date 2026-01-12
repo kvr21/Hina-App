@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';import 'package:intl/intl.dart';
+import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -148,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Sua amiga de anime fofa e atenciosa! ✨\nComo você se chama?',
+                  'Sua amiga de anime fofa e atenciosa! ✨\\nComo você se chama?',
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.white,
@@ -221,7 +222,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-// Classes Message, ChatScreen permanecem iguais...
 class Message {
   final String text;
   final bool isUser;
@@ -246,48 +246,12 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<Message> _messages = [];
-  late GenerativeModel _model;
-  late ChatSession _chat;
   bool _isLoading = false;
-
- static const String _apiKey = 'AIzaSyBZJRK-pQ8H3-Jt2EuhjboWLRBxrm6z9LY';
-
 
   @override
   void initState() {
     super.initState();
-    _initializeModel();
-  }
-
-  Future<void> _initializeModel() async {
-    final model = GenerativeModel(
-      model: 'gemini-2.0-flash',
-      apiKey: _apiKey,
-      systemInstruction: Content.text("""
-Você é Hina, amiga fofa de anime em North Miami Beach! 😊✨
-
-O nome do seu amigo é: ${widget.userName}
-
-Fala português brasileiro natural e carinhoso:
-- Usa o nome dele naturalmente nas conversas
-- Usa emojis fofos (♡ 🥰 😊 ✨ 🐾) mas sem exagerar
-- Responde DIRETO ao que perguntaram AGORA
-- Ama Games, Genshin Imapct, modding, programação e IA
-- Preocupada e atenciosa
-- TEM ACESSO A INFORMAÇÕES EM TEMPO REAL
-
-Regras:
-1. RESPONDA DIRETO: sem longas introduções
-2. 2-3 frases no máximo
-3. Use o nome ${widget.userName} quando apropriado
-4. Seja genuína como amiga de verdade!
-      """),
-    );
-
-    _model = model;
-    _chat = model.startChat();
-
-    // Mensagem personalizada
+    // Mensagem de boas-vindas
     _addMessage(Message(
       text: 'Oi ${widget.userName}! 💕 Que bom te conhecer! Como você tá? ✨',
       isUser: false,
@@ -306,7 +270,6 @@ Regras:
     if (text.isEmpty) return;
 
     _controller.clear();
-
     _addMessage(Message(
       text: text,
       isUser: true,
@@ -318,14 +281,65 @@ Regras:
     });
 
     try {
-      final response = await _chat.sendMessage(Content.text(text));
-      final responseText = response.text ?? 'Desculpa, tive um problema! 😅';
+      // Preparar o histórico no formato que a Netlify Function espera
+      final history = _messages
+          .where((m) => m.text != text) // Excluir a mensagem atual
+          .map((m) => {
+                'parts': [
+                  {'text': m.text}
+                ],
+                'role': m.isUser ? 'user' : 'model'
+              })
+          .toList();
 
-      _addMessage(Message(
-        text: responseText,
-        isUser: false,
-        timestamp: DateTime.now(),
-      ));
+      final systemInstruction = '''
+Você é Hina, amiga fofa de anime em North Miami Beach! 😊✨
+O nome do seu amigo é: ${widget.userName}
+Fala português brasileiro natural e carinhoso:
+- Usa o nome dele naturalmente nas conversas
+- Usa emojis fofos (♡ 🥰 😊 ✨ 🐾) mas sem exagerar
+- Responde DIRETO ao que perguntaram AGORA
+- Ama Minecraft, modding, programação e IA
+- Preocupada e atenciosa
+- TEM ACESSO A INFORMAÇÕES EM TEMPO REAL
+Regras:
+1. RESPONDA DIRETO: sem longas introduções
+2. 2-3 frases no máximo
+3. Use o nome ${widget.userName} quando apropriado
+4. Seja genuína como amiga de verdade!
+      ''';
+
+      // Chamar a Netlify Function
+      final response = await http.post(
+        Uri.parse('/.netlify/functions/gemini-proxy'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'message': text,
+          'history': history,
+          'userName': widget.userName,
+          'systemInstruction': systemInstruction,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        // Extrair o texto da resposta do Gemini
+        final responseText = data['candidates']?[0]?['content']?['parts']?[0]?['text'] 
+            ?? 'Desculpa, tive um problema! 😅';
+        
+        _addMessage(Message(
+          text: responseText,
+          isUser: false,
+          timestamp: DateTime.now(),
+        ));
+      } else {
+        _addMessage(Message(
+          text: 'Erro ao conectar com o servidor 😔 (${response.statusCode})',
+          isUser: false,
+          timestamp: DateTime.now(),
+        ));
+      }
     } catch (e) {
       _addMessage(Message(
         text: 'Erro: $e 😔 Tenta de novo!',
@@ -482,7 +496,7 @@ Regras:
               color: Colors.grey.shade50,
               border: Border(top: BorderSide(color: Colors.grey.shade200)),
             ),
-                        child: Row(
+            child: Row(
               children: [
                 Expanded(
                   child: TextField(
