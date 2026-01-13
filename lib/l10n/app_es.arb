@@ -1,0 +1,11 @@
+{
+  "@@locale": "es",
+  "appTitle": "Hina - Tu Amiga IA",
+  "welcomeTitle": "¡Hola! Soy Hina 💕",
+  "welcomeSubtitle": "¡Tu linda y cariñosa amiga anime! ✨\n¿Cómo te llamas?",
+  "namePlaceholder": "Tu nombre aquí...",
+  "startButton": "¡Empezar a chatear! 🎉",
+  "chatPlaceholder": "Hola Hina...",
+  "errorApiKey": "Error: La clave API expiró. Renueva la clave. 😢 ¡Intenta de nuevo!",
+  "language": "Idioma"
+}
