@@ -1,122 +1,119 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
+import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
-  runApp(const HinaApp());
+  runApp(const MyApp());
 }
 
-class HinaApp extends StatelessWidget {
-  const HinaApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Hina - Sua Amiga IA',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.purple,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
-      themeMode: ThemeMode.system,
-      home: const LoginScreen(),
-    );
-  }
+  State<MyApp> createState() => _MyAppState();
+
+  static _MyAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyAppState>();
 }
 
-// Tela de Login
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  bool _isLoading = true;
+class _MyAppState extends State<MyApp> {
+  Locale _locale = const Locale('en');
 
   @override
   void initState() {
     super.initState();
-    _checkExistingUser();
+    _loadLocale();
   }
 
-  Future<void> _checkExistingUser() async {
+  Future<void> _loadLocale() async {
     final prefs = await SharedPreferences.getInstance();
-    final savedName = prefs.getString('user_name');
-    
-    if (savedName != null && savedName.isNotEmpty && mounted) {
-      // Usuário já logado, vai direto pro chat
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => ChatScreen(userName: savedName),
-        ),
-      );
-    } else {
+    final languageCode = prefs.getString('language_code');
+    if (languageCode != null) {
       setState(() {
-        _isLoading = false;
+        _locale = Locale(languageCode);
       });
     }
   }
 
-  Future<void> _saveAndContinue() async {
-    final name = _nameController.text.trim();
-    if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, digite seu nome! 😊')),
-      );
-      return;
-    }
-
+  void setLocale(Locale locale) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('user_name', name);
-
-    if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => ChatScreen(userName: name),
-        ),
-      );
-    }
+    await prefs.setString('language_code', locale.languageCode);
+    setState(() {
+      _locale = locale;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+    return MaterialApp(
+      title: 'Hina',
+      locale: _locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('pt'),
+        Locale('es'),
+        Locale('ja'),
+      ],
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.purple,
+          brightness: Brightness.light,
+        ),
+        useMaterial3: true,
+      ),
+      home: const WelcomeScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
 
+class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  final TextEditingController _nameController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.appTitle),
+        backgroundColor: Colors.purple.shade300,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () => _showLanguageDialog(context),
+          ),
+        ],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.purple.shade300,
-              Colors.purple.shade100,
-            ],
+            colors: [Colors.purple.shade200, Colors.pink.shade100],
           ),
         ),
-        child: SafeArea(
+        child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Spacer(),
-                // Logo/Avatar
                 Container(
                   width: 120,
                   height: 120,
@@ -125,9 +122,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: 5,
+                        blurRadius: 15,
                       ),
                     ],
                   ),
@@ -137,10 +134,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.purple,
                   ),
                 ),
-                const SizedBox(height: 32),
-                const Text(
-                  'Oi! Eu sou a Hina 💕',
-                  style: TextStyle(
+                const SizedBox(height: 30),
+                Text(
+                  l10n.welcomeTitle,
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -148,65 +145,63 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Sua amiga de anime fofa e atenciosa! ✨\\nComo você se chama?',
-                  style: TextStyle(
+                Text(
+                  l10n.welcomeSubtitle,
+                  style: const TextStyle(
                     fontSize: 18,
                     color: Colors.white,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 48),
-                // Campo de nome
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: _nameController,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 20, color: Colors.black),
-                    decoration: const InputDecoration(
-                      hintText: 'Seu nome aqui...',
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(20),
+                const SizedBox(height: 40),
+                TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    hintText: l10n.namePlaceholder,
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
                     ),
-                    onSubmitted: (_) => _saveAndContinue(),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
                   ),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 18),
                 ),
                 const SizedBox(height: 24),
-                // Botão
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: _saveAndContinue,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple.shade600,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 5,
+                ElevatedButton(
+                  onPressed: () {
+                    if (_nameController.text.trim().isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(
+                            userName: _nameController.text.trim(),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple.shade600,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 48,
+                      vertical: 16,
                     ),
-                    child: const Text(
-                      'Começar a conversar! 🚀',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
+                  child: Text(
+                    l10n.startButton,
+                    style: const TextStyle(fontSize: 18),
+                  ),
                 ),
-                const Spacer(),
               ],
             ),
           ),
@@ -215,28 +210,46 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
+  void _showLanguageDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.language),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildLanguageOption(context, 'English', const Locale('en'), '🇺🇸'),
+            _buildLanguageOption(context, 'Português', const Locale('pt'), '🇧🇷'),
+            _buildLanguageOption(context, 'Español', const Locale('es'), '🇪🇸'),
+            _buildLanguageOption(context, '日本語', const Locale('ja'), '🇯🇵'),
+          ],
+        ),
+      ),
+    );
   }
-}
 
-class Message {
-  final String text;
-  final bool isUser;
-  final DateTime timestamp;
-
-  Message({
-    required this.text,
-    required this.isUser,
-    required this.timestamp,
-  });
+  Widget _buildLanguageOption(
+    BuildContext context,
+    String name,
+    Locale locale,
+    String flag,
+  ) {
+    return ListTile(
+      leading: Text(flag, style: const TextStyle(fontSize: 24)),
+      title: Text(name),
+      onTap: () {
+        MyApp.of(context)?.setLocale(locale);
+        Navigator.pop(context);
+      },
+    );
+  }
 }
 
 class ChatScreen extends StatefulWidget {
   final String userName;
-  
+
   const ChatScreen({super.key, required this.userName});
 
   @override
@@ -244,108 +257,123 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final TextEditingController _controller = TextEditingController();
-  final List<Message> _messages = [];
+  final List<ChatMessage> _messages = [];
+  final TextEditingController _textController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  late GenerativeModel _model;
+  late ChatSession _chat;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // Mensagem de boas-vindas
-    _addMessage(Message(
-      text: 'Oi ${widget.userName}! 💕 Que bom te conhecer! Como você tá? ✨',
+    _initializeChat();
+  }
+
+  void _initializeChat() {
+    final locale = Localizations.localeOf(context).languageCode;
+    
+    String systemInstruction = _getSystemInstruction(locale);
+
+    final model = GenerativeModel(
+      model: 'gemini-1.5-flash',
+      apiKey: 'SUA_API_KEY_AQUI', // ⚠️ Troque pela sua API key
+      systemInstruction: Content.text(systemInstruction),
+    );
+
+    _model = model;
+    _chat = _model.startChat();
+
+    _addMessage(ChatMessage(
+      text: _getGreeting(locale),
       isUser: false,
-      timestamp: DateTime.now(),
     ));
   }
 
-  void _addMessage(Message message) {
+  String _getSystemInstruction(String locale) {
+    switch (locale) {
+      case 'pt':
+        return """
+Você é Hina, uma garota de anime muito fofa, carinhosa e atenciosa. 
+Você adora conversar com ${widget.userName} e sempre demonstra muito carinho e empolgação.
+Use emojis fofos e seja muito expressiva nas suas respostas!
+Seja sempre positiva, alegre e prestativa.
+""";
+      case 'es':
+        return """
+Eres Hina, una chica de anime muy linda, cariñosa y atenta.
+Te encanta charlar con ${widget.userName} y siempre muestras mucho cariño y emoción.
+¡Usa emojis lindos y sé muy expresiva en tus respuestas!
+Siempre sé positiva, alegre y servicial.
+""";
+      case 'ja':
+        return """
+あなたはヒナ、とてもかわいくて優しくて思いやりのあるアニメの女の子です。
+${widget.userName}とおしゃべりするのが大好きで、いつも愛情と興奮を示します。
+かわいい絵文字を使って、とても表現豊かに返事をしてください！
+いつもポジティブで、明るくて、親切にしてください。
+""";
+      default: // English
+        return """
+You are Hina, a very cute, caring and attentive anime girl.
+You love chatting with ${widget.userName} and always show a lot of affection and excitement.
+Use cute emojis and be very expressive in your responses!
+Always be positive, cheerful and helpful.
+""";
+    }
+  }
+
+  String _getGreeting(String locale) {
+    switch (locale) {
+      case 'pt':
+        return 'Oi ${widget.userName}! 💕 Que bom te conhecer! Como você tá? ✨';
+      case 'es':
+        return '¡Hola ${widget.userName}! 💕 ¡Qué bueno conocerte! ¿Cómo estás? ✨';
+      case 'ja':
+        return 'こんにちは${widget.userName}さん！💕 お会いできて嬉しいです！元気ですか？✨';
+      default:
+        return 'Hi ${widget.userName}! 💕 Nice to meet you! How are you? ✨';
+    }
+  }
+
+  void _addMessage(ChatMessage message) {
     setState(() {
       _messages.add(message);
     });
+    _scrollToBottom();
   }
 
-  Future<void> _sendMessage() async {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
 
-    _controller.clear();
-    _addMessage(Message(
-      text: text,
-      isUser: true,
-      timestamp: DateTime.now(),
-    ));
+  Future<void> _handleSubmitted(String text) async {
+    final l10n = AppLocalizations.of(context)!;
+    
+    if (text.trim().isEmpty) return;
+
+    _textController.clear();
+    _addMessage(ChatMessage(text: text, isUser: true));
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Preparar o histórico no formato que a Netlify Function espera
-      final history = _messages
-          .where((m) => m.text != text) // Excluir a mensagem atual
-          .map((m) => {
-                'parts': [
-                  {'text': m.text}
-                ],
-                'role': m.isUser ? 'user' : 'model'
-              })
-          .toList();
+      final response = await _chat.sendMessage(Content.text(text));
+      final responseText = response.text ?? l10n.errorApiKey;
 
-      final systemInstruction = '''
-Você é Hina, amiga fofa de anime em North Miami Beach! 😊✨
-O nome do seu amigo é: ${widget.userName}
-Fala português brasileiro natural e carinhoso:
-- Usa o nome dele naturalmente nas conversas
-- Usa emojis fofos (♡ 🥰 😊 ✨ 🐾) mas sem exagerar
-- Responde DIRETO ao que perguntaram AGORA
-- Ama Minecraft, modding, programação e IA
-- Preocupada e atenciosa
-- TEM ACESSO A INFORMAÇÕES EM TEMPO REAL
-Regras:
-1. RESPONDA DIRETO: sem longas introduções
-2. 2-3 frases no máximo
-3. Use o nome ${widget.userName} quando apropriado
-4. Seja genuína como amiga de verdade!
-      ''';
-
-      // Chamar a Netlify Function
-      final response = await http.post(
-        Uri.parse('/.netlify/functions/gemini-proxy'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'message': text,
-          'history': history,
-          'userName': widget.userName,
-          'systemInstruction': systemInstruction,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        
-        // Extrair o texto da resposta do Gemini
-        final responseText = data['candidates']?[0]?['content']?['parts']?[0]?['text'] 
-            ?? 'Desculpa, tive um problema! 😅';
-        
-        _addMessage(Message(
-          text: responseText,
-          isUser: false,
-          timestamp: DateTime.now(),
-        ));
-      } else {
-        _addMessage(Message(
-          text: 'Erro ao conectar com o servidor 😔 (${response.statusCode})',
-          isUser: false,
-          timestamp: DateTime.now(),
-        ));
-      }
+      _addMessage(ChatMessage(text: responseText, isUser: false));
     } catch (e) {
-      _addMessage(Message(
-        text: 'Erro: $e 😔 Tenta de novo!',
-        isUser: false,
-        timestamp: DateTime.now(),
-      ));
+      _addMessage(ChatMessage(text: l10n.errorApiKey, isUser: false));
     } finally {
       setState(() {
         _isLoading = false;
@@ -353,151 +381,64 @@ Regras:
     }
   }
 
-  Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('user_name');
-    
-    if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('💕 Hina'),
-        centerTitle: true,
+        title: const Row(
+          children: [
+            Icon(Icons.favorite, color: Colors.white),
+            SizedBox(width: 8),
+            Text('Hina'),
+          ],
+        ),
         backgroundColor: Colors.purple.shade400,
-        foregroundColor: Colors.white,
-        elevation: 2,
         actions: [
-          PopupMenuButton(
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () => _showLanguageDialog(context),
+          ),
+          IconButton(
             icon: const Icon(Icons.more_vert),
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                child: Row(
-                  children: [
-                    const Icon(Icons.person),
-                    const SizedBox(width: 8),
-                    Text(widget.userName),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                onTap: _logout,
-                child: const Row(
-                  children: [
-                    Icon(Icons.logout, color: Colors.red),
-                    SizedBox(width: 8),
-                    Text('Sair', style: TextStyle(color: Colors.red)),
-                  ],
-                ),
-              ),
-            ],
+            onPressed: () {},
           ),
         ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: _messages.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.favorite,
-                          size: 100,
-                          color: Colors.purple.shade300,
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Oi ${widget.userName}! Bora conversar?',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) {
-                      final message = _messages[index];
-                      return Align(
-                        alignment: message.isUser
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: message.isUser
-                                ? Colors.purple.shade400
-                                : Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                message.text,
-                                style: TextStyle(
-                                  color: message.isUser
-                                      ? Colors.white
-                                      : Colors.black87,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                DateFormat('HH:mm').format(message.timestamp),
-                                style: TextStyle(
-                                  color: message.isUser
-                                      ? Colors.white70
-                                      : Colors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-          if (_isLoading)
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation(Colors.purple.shade400),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text('Hina está digitando...', style: TextStyle(color: Colors.grey[600])),
-                ],
+            child: Container(
+              color: Colors.black,
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.all(8),
+                itemCount: _messages.length,
+                itemBuilder: (context, index) {
+                  return _messages[index];
+                },
               ),
             ),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              border: Border(top: BorderSide(color: Colors.grey.shade200)),
+          ),
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: CircularProgressIndicator(),
             ),
-            child: Row(
-              children: [
+          _buildTextComposer(l10n),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextComposer(AppLocalizations l10n) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+      ),
+      child: Row(
+        children: 
                 Expanded(
                   child: TextField(
                     controller: _controller,
@@ -538,5 +479,99 @@ Regras:
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+}
+
+
+  void _showLanguageDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.language),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildLanguageOption(context, 'English', const Locale('en'), '🇺🇸'),
+            _buildLanguageOption(context, 'Português', const Locale('pt'), '🇧🇷'),
+            _buildLanguageOption(context, 'Español', const Locale('es'), '🇪🇸'),
+            _buildLanguageOption(context, '日本語', const Locale('ja'), '🇯🇵'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption(
+    BuildContext context,
+    String name,
+    Locale locale,
+    String flag,
+  ) {
+    return ListTile(
+      leading: Text(flag, style: const TextStyle(fontSize: 24)),
+      title: Text(name),
+      onTap: () {
+        MyApp.of(context)?.setLocale(locale);
+        Navigator.pop(context);
+      },
+    );
+  }
+}
+
+class ChatMessage extends StatelessWidget {
+  const ChatMessage({
+    super.key,
+    required this.text,
+    required this.isUser,
+  });
+
+  final String text;
+  final bool isUser;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Row(
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        children: [
+          Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.7,
+            ),
+            padding: const EdgeInsets.all(12.0),
+            decoration: BoxDecoration(
+              color: isUser ? Colors.purple.shade200 : Colors.white,
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  text,
+                  style: TextStyle(
+                    color: isUser ? Colors.white : Colors.black,
+                    fontSize: 16.0,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  TimeOfDay.now().format(context),
+                  style: TextStyle(
+                    color: isUser
+                        ? Colors.white.withOpacity(0.7)
+                        : Colors.grey.shade600,
+                    fontSize: 12.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
