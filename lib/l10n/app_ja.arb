@@ -1,11 +1,19 @@
 {
   "@@locale": "ja",
   "appTitle": "ヒナ - あなたのAI友達",
+  "@appTitle": {"description": "The application title"},
   "welcomeTitle": "こんにちは！私はヒナです 💕",
+  "@welcomeTitle": {"description": "Welcome screen title"},
   "welcomeSubtitle": "かわいくて優しいアニメの友達だよ！✨\nあなたのお名前は？",
+  "@welcomeSubtitle": {"description": "Welcome screen subtitle"},
   "namePlaceholder": "ここにお名前を...",
-  "startButton": "チャットを始める！🎉",
+  "@namePlaceholder": {"description": "Name input placeholder"},
+  "startButton": "チャットを始める！😊",
+  "@startButton": {"description": "Start chat button"},
   "chatPlaceholder": "こんにちは、ヒナ...",
+  "@chatPlaceholder": {"description": "Chat input placeholder"},
   "errorApiKey": "エラー：APIキーの期限が切れました。キーを更新してください。😢 もう一度試してください！",
-  "language": "言語"
+  "@errorApiKey": {"description": "API key error message"},
+  "language": "言語",
+  "@language": {"description": "Language selector"}
 }
