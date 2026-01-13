@@ -15,8 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeTitle => 'Hi! I\'m Hina 💕';
 
   @override
-  String get welcomeSubtitle =>
-      'Your cute and caring anime friend! ✨\nWhat\'s your name?';
+  String get welcomeSubtitle => 'Your cute and caring anime friend! ✨\nWhat\'s your name?';
 
   @override
   String get namePlaceholder => 'Your name here...';
@@ -28,8 +27,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatPlaceholder => 'Hi Hina...';
 
   @override
-  String get errorApiKey =>
-      'Error: API key expired. Please renew the API key. 😢 Try again!';
+  String get errorApiKey => 'Error: API key expired. Please renew the API key. 😢 Try again!';
 
   @override
   String get language => 'Language';

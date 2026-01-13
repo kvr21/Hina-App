@@ -64,8 +64,7 @@ import 'app_localizations_pt.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale)
-    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -73,8 +72,7 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -86,73 +84,71 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
-        delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
     Locale('es'),
     Locale('ja'),
-    Locale('pt'),
+    Locale('pt')
   ];
 
   /// No description provided for @appTitle.
   ///
-  /// In pt, this message translates to:
-  /// **'Hina - Sua Amiga IA'**
+  /// In en, this message translates to:
+  /// **'Hina - Your AI Friend'**
   String get appTitle;
 
   /// No description provided for @welcomeTitle.
   ///
-  /// In pt, this message translates to:
-  /// **'Oi! Eu sou a Hina 💕'**
+  /// In en, this message translates to:
+  /// **'Hi! I\'m Hina 💕'**
   String get welcomeTitle;
 
   /// No description provided for @welcomeSubtitle.
   ///
-  /// In pt, this message translates to:
-  /// **'Sua amiga de anime fofa e atenciosa! ✨\nComo você se chama?'**
+  /// In en, this message translates to:
+  /// **'Your cute and caring anime friend! ✨\nWhat\'s your name?'**
   String get welcomeSubtitle;
 
   /// No description provided for @namePlaceholder.
   ///
-  /// In pt, this message translates to:
-  /// **'Seu nome aqui...'**
+  /// In en, this message translates to:
+  /// **'Your name here...'**
   String get namePlaceholder;
 
   /// No description provided for @startButton.
   ///
-  /// In pt, this message translates to:
-  /// **'Começar a conversar! 🎉'**
+  /// In en, this message translates to:
+  /// **'Start chatting! 🎉'**
   String get startButton;
 
   /// No description provided for @chatPlaceholder.
   ///
-  /// In pt, this message translates to:
-  /// **'Oi Hina...'**
+  /// In en, this message translates to:
+  /// **'Hi Hina...'**
   String get chatPlaceholder;
 
   /// No description provided for @errorApiKey.
   ///
-  /// In pt, this message translates to:
-  /// **'Erro: API key expirada. Renove a chave. 😢 Tenta de novo!'**
+  /// In en, this message translates to:
+  /// **'Error: API key expired. Please renew the API key. 😢 Try again!'**
   String get errorApiKey;
 
   /// No description provided for @language.
   ///
-  /// In pt, this message translates to:
-  /// **'Idioma'**
+  /// In en, this message translates to:
+  /// **'Language'**
   String get language;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -161,30 +157,27 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'es', 'ja', 'pt'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'es', 'ja', 'pt'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en':
-      return AppLocalizationsEn();
-    case 'es':
-      return AppLocalizationsEs();
-    case 'ja':
-      return AppLocalizationsJa();
-    case 'pt':
-      return AppLocalizationsPt();
+    case 'en': return AppLocalizationsEn();
+    case 'es': return AppLocalizationsEs();
+    case 'ja': return AppLocalizationsJa();
+    case 'pt': return AppLocalizationsPt();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.',
+    'that was used.'
   );
 }
