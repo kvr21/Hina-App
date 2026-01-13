@@ -1,11 +1,19 @@
 {
   "@@locale": "pt",
   "appTitle": "Hina - Sua Amiga IA",
+  "@appTitle": {"description": "The application title"},
   "welcomeTitle": "Oi! Eu sou a Hina 💕",
+  "@welcomeTitle": {"description": "Welcome screen title"},
   "welcomeSubtitle": "Sua amiga de anime fofa e atenciosa! ✨\nComo você se chama?",
+  "@welcomeSubtitle": {"description": "Welcome screen subtitle"},
   "namePlaceholder": "Seu nome aqui...",
-  "startButton": "Começar a conversar! 🎉",
+  "@namePlaceholder": {"description": "Name input placeholder"},
+  "startButton": "Começar a conversar! 😊",
+  "@startButton": {"description": "Start chat button"},
   "chatPlaceholder": "Oi Hina...",
-  "errorApiKey": "Erro: API key expirada. Renove a chave. 😢 Tenta de novo!",
-  "language": "Idioma"
+  "@chatPlaceholder": {"description": "Chat input placeholder"},
+  "errorApiKey": "Erro: API key expirada. Remova a chave. 😢 Tenta de novo!",
+  "@errorApiKey": {"description": "API key error message"},
+  "language": "Idioma",
+  "@language": {"description": "Language selector"}
 }
