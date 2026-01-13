@@ -457,12 +457,14 @@ Always be positive, cheerful and helpful.
                         vertical: 16,
                       ),
                     ),
-                    onSubmitted: (_) => _sendMessage(),
+                    onSubmitted: (_) => 
+                    _handleSubmitted(_textController.text),
                   ),
                 ),
                 const SizedBox(width: 12),
                 FloatingActionButton(
-                  onPressed: _isLoading ? null : _sendMessage,
+                  onPressed: _isLoading ? null : () =>
+                   _handleSubmitted(_textController.text),
                   backgroundColor: Colors.purple.shade400,
                   mini: true,
                   child: const Icon(Icons.send, color: Colors.white),
@@ -470,9 +472,6 @@ Always be positive, cheerful and helpful.
               ],
             ),
           ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -518,7 +517,6 @@ Always be positive, cheerful and helpful.
       },
     );
   }
-}
 
 class ChatMessage extends StatelessWidget {
   const ChatMessage({
