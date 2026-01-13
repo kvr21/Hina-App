@@ -438,10 +438,10 @@ Always be positive, cheerful and helpful.
         color: Theme.of(context).cardColor,
       ),
       child: Row(
-        children: 
+        children:  [
                 Expanded(
                   child: TextField(
-                    controller: _controller,
+                    controller: _textController,
                     style: const TextStyle(color: Colors.black87),
                     decoration: InputDecoration(
                       hintText: 'Oi Hina...',
@@ -477,7 +477,7 @@ Always be positive, cheerful and helpful.
 
   @override
   void dispose() {
-    _controller.dispose();
+    _textController.dispose();
     super.dispose();
   }
 }
