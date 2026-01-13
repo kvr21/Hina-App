@@ -1,0 +1,11 @@
+{
+  "@@locale": "ja",
+  "appTitle": "ヒナ - あなたのAI友達",
+  "welcomeTitle": "こんにちは！私はヒナです 💕",
+  "welcomeSubtitle": "かわいくて優しいアニメの友達だよ！✨\nあなたのお名前は？",
+  "namePlaceholder": "ここにお名前を...",
+  "startButton": "チャットを始める！🎉",
+  "chatPlaceholder": "こんにちは、ヒナ...",
+  "errorApiKey": "エラー：APIキーの期限が切れました。キーを更新してください。😢 もう一度試してください！",
+  "language": "言語"
+}
