@@ -13,6 +13,7 @@ class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 
+  // ignore: library_private_types_in_public_api
   static _MyAppState? of(BuildContext context) =>
       context.findAncestorStateOfType<_MyAppState>();
 }
@@ -274,7 +275,7 @@ class _ChatScreenState extends State<ChatScreen> {
     
     final model = GenerativeModel(
       model: 'gemini-1.5-flash',
-      apiKey: 'SUA_API_KEY_AQUI', // ⚠️ Troque pela sua API key
+      apiKey: const String.fromEnvironment('GEMINI_API_KEY'),
     );
 
     _model = model;
@@ -285,7 +286,7 @@ class _ChatScreenState extends State<ChatScreen> {
       isUser: false,
     ));
   }
-  
+
   String _getGreeting(String locale) {
     switch (locale) {
       case 'pt':
