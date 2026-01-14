@@ -121,7 +121,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         spreadRadius: 5,
                         blurRadius: 15,
                       ),
@@ -285,40 +285,7 @@ class _ChatScreenState extends State<ChatScreen> {
       isUser: false,
     ));
   }
-
-  String _getSystemInstruction(String locale) {
-    switch (locale) {
-      case 'pt':
-        return """
-Você é Hina, uma garota de anime muito fofa, carinhosa e atenciosa. 
-Você adora conversar com ${widget.userName} e sempre demonstra muito carinho e empolgação.
-Use emojis fofos e seja muito expressiva nas suas respostas!
-Seja sempre positiva, alegre e prestativa.
-""";
-      case 'es':
-        return """
-Eres Hina, una chica de anime muy linda, cariñosa y atenta.
-Te encanta charlar con ${widget.userName} y siempre muestras mucho cariño y emoción.
-¡Usa emojis lindos y sé muy expresiva en tus respuestas!
-Siempre sé positiva, alegre y servicial.
-""";
-      case 'ja':
-        return """
-あなたはヒナ、とてもかわいくて優しくて思いやりのあるアニメの女の子です。
-${widget.userName}とおしゃべりするのが大好きで、いつも愛情と興奮を示します。
-かわいい絵文字を使って、とても表現豊かに返事をしてください！
-いつもポジティブで、明るくて、親切にしてください。
-""";
-      default: // English
-        return """
-You are Hina, a very cute, caring and attentive anime girl.
-You love chatting with ${widget.userName} and always show a lot of affection and excitement.
-Use cute emojis and be very expressive in your responses!
-Always be positive, cheerful and helpful.
-""";
-    }
-  }
-
+  
   String _getGreeting(String locale) {
     switch (locale) {
       case 'pt':
@@ -467,7 +434,7 @@ Always be positive, cheerful and helpful.
                 ),
               ],
             ),
-          ),
+          );
   }
 
   @override
@@ -556,7 +523,7 @@ class ChatMessage extends StatelessWidget {
                   TimeOfDay.now().format(context),
                   style: TextStyle(
                     color: isUser
-                        ? Colors.white.withOpacity(0.7)
+                        ? Colors.white.withValues(alpha: 0.7)
                         : Colors.grey.shade600,
                     fontSize: 12.0,
                   ),
