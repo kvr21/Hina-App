@@ -272,12 +272,9 @@ class _ChatScreenState extends State<ChatScreen> {
   void _initializeChat() {
     final locale = Localizations.localeOf(context).languageCode;
     
-    String systemInstruction = _getSystemInstruction(locale);
-
     final model = GenerativeModel(
       model: 'gemini-1.5-flash',
       apiKey: 'SUA_API_KEY_AQUI', // ⚠️ Troque pela sua API key
-      systemInstruction: Content.text(systemInstruction),
     );
 
     _model = model;
