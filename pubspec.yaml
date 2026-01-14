@@ -28,6 +28,6 @@ dev_dependencies:
 
 flutter:
   generate: true
-  uses-material-design: 
-    assets:
+  uses-material-design:  true
+    sets:
         - .env
