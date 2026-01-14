@@ -3,7 +3,10 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'generated/app_localizations.dart';
-void main() {
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");  // Adicione esta linha
   runApp(const MyApp());
 }
 
